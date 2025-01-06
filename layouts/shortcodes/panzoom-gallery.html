@@ -1,0 +1,9 @@
+{{ $id := delimit (slice "gallery" (partial "functions/uid.html" .)) "-" }}
+
+{{- $caption := .Get "caption" }}
+
+
+<div id="{{ $id }}" class="gallery">
+  {{ .Inner }}
+</div>
+{{ with $caption }}<figcaption>{{ . | markdownify }}</figcaption>{{ end }}
