@@ -1,112 +1,119 @@
 ---
 title: Watercooling My Homelab
 description: Watercooling for my homelab with a custom, leak-resistant controller and monitoring!
-date: 2024-11-27T02:14:28.867Z
-preview: /Supermicro_846_Internal.jpg
+date: 2025-01-06T23:48:36.633Z
+preview: /Supermicro_846_Internal.webp
 draft: true
 tags:
-    - alphacool
-    - arduino
-    - intel
-    - nvidia
-    - supermicro
-    - aquacomputer
+  - alphacool
+  - arduino
+  - intel
+  - nvidia
+  - supermicro
+  - aqua computer
 categories:
-    - homelab
-    - servers
-    - watercooling
-    - diy
+  - homelab
+  - servers
+  - watercooling
+  - diy
 ---
 
 ## Overview
-Watercooling - or, more accurately, custom loop watercooling[^badnomenclature] over AIOs - has increasingly transitioned to an aesthetic choice rather than a practical one in the consumer gaming space, with more energy efficient chips overclocked out the wazoo from the factory and relatively minimal gains to be made. Whereas, in the enterprise space, with ever-increasing power density, it's becoming the only option for many types of deployments. A lot of people are intimidated by custom watercooling, especially when it comes to their costly (in terms of cash, or time, or both) homelab setups. In this post I'm going to showcase my solution for a leak-resistant watercooling system with monitoring that I trust to protect my beloved rack from the horrors of water damage as well as thermal throttling.
+Watercooling - or, more accurately, custom loop watercooling[^badnomenclature] over AIOs - has increasingly transitioned to an aesthetic choice rather than a practical one in the consumer gaming space, with more energy efficient chips overclocked out the wazoo from the factory and relatively minimal gains to be made compared to cheaper and easier AIO solutions. However, there are still benefits to be had, marginal as they are, in performance, aesthetics, and convenience. A lot of people are intimidated by custom watercooling, especially when it comes to their costly (in terms of cash, or time, or both) homelab setups. Some will even call you CRAZY (which is very rude, by the way) for saying you want to watercool your server. In this post I'm going to showcase my solution for a leak-resistant watercooling system with monitoring that I trust to protect my beloved rack from the horrors of water damage as well as thermal throttling.
+
+{{< panzoom-figure
+    src="images/compressed/Triple_Card_Jank.webp"
+    alt="My initial setup with 3x 2080 Tis, using m.2 NVMe to PCIe risers in an ASUS prebuilt. Two are connected by NVLINK, which I found to provide a slight performance benefit on the order of ~1-5% in multi-GPU SISR training, which is not worth the typical price for NVLINK bridges from this era. I was lucky to get this ugly, quadro-oriented bridge for just $40."
+    caption="My initial setup with 3x 2080 Tis, using m.2 NVMe to PCIe risers in an ASUS prebuilt. Two are connected by NVLINK, which I found to provide a slight performance benefit on the order of ~1-5% in multi-GPU SISR training, which is not worth the typical price for NVLINK bridges from this era. I was lucky to get this ugly, quadro-oriented bridge for just $40."
+>}}
+
+I had wanted to watercool my ML setup for a while, particularly so I could use NVLINK without suffocating the GPUs. The above setup worked, but it was loud, the clock speeds were inconsistent, VRAM overclocking was very limited, they would bounce off the power/temperature limit, and it was an incredible pain to move whenever I had to poke around in there. However, I was very deeply concerned about the possibility of water damage. I've been watercooling since 2020, and I've never had a leak, but there were going to be more connected components than ever, with wider temperature swings, and collectively, a whole lot more expensive hardware that might get damaged than compared to my desktop setup. The situation became more dire to me, after I upgraded my main server and discovered that the forced-air passive chassis cooling was insufficient for my new CPUs.
+
+So, how do you make a fluid system resistant to leaks? Build it very well, with close attention to detail, tighten all the fittings very carefully, regularly replace your o-rings and leak-check extensively before operation? No! You pull a vacuum inside the fluid loop! Just think about it. Water can't get out if air is trying to get in. It's so simple. I wish I could say that I came up with the concept myself, but I didn't. After finding out that Aqua Computer has a product called LEAKSHIELD which does exactly that, I finally had the confidence to take the plunge on this project.
+
+{{< youtubeLite id="8UiRv0nDch0" >}}
 
 ## The Hardware
-Most of the build uses pretty standard off-the-shelf parts for PC watercooling, but there are a few bits and pieces that most builders won't have seen before, and a couple custom solutions that provided a better experience than what standard PC parts can offer. The control system is 100% custom, based on an Arduino Uno clone that feeds vital statistics to the server over serial, and features Dallas 1-wire digital temperature probes and an interesting pressure gauge that I will expand on further down.
+Most of the build uses pretty standard off-the-shelf parts for PC watercooling, but there are a few bits and pieces that most builders won't have seen before, and a couple custom solutions that provided a better experience than what standard PC parts can offer. The control system is 100% custom, based on an Arduino Uno that feeds vital statistics over serial, and features a custom pressure control system similar to the LEAKSHIELD, with PID fan control based on a set delta between the water and air temperature.
 
 ### Off-the-shelf
 #### General Details
+
+The centerpiece of the build, which the control unit and pump mount to, is the "MOther of all RAdiators", version 3, from Watercool. This is the 360mm version with support for up to 18 120mm fans, or eight 180mm fans. It's constructed more in the spirit of a vehicle radiator than a traditional PC radiator, with a less restrictive fin stack and large, round tubes rather than thin rectangular ones. It provides several mounting points for accessories which I was able to utilize to secure it to my server rack in a satisfactorily sturdy fashion. An in-depth teardown on the construction method and material quality of the MO-RA can be found on [igor'sLAB](https://www.igorslab.de/en/the-big-radiator-material-test-how-much-copper-and-technology-is-in-the-watercool-mo-ra3-360-pro-part-4/). For fans, I have a collection of old DC-control Corsair Air Series SP120s. They've all been retired from regular use, because of noise-related aging issues. In fact, one of them failed to turn at all once I had everything wired up, and another had its bearing disintegrate (and I really mean disintegrate, the fan became almost entirely un-born and would consistently ram into its own frame) about 8 weeks after putting the thing into service. That being said, they did survive (and continue to survive, in the remaining 16 cases) 24/7 use for anywhere from 4-10 years, at bottom of the barrel pricing, so that's not too bad. I'm not exactly pushing the limits of this radiator here, so a few fans breaking down over time isn't the end of the world.
+
+
 {{< panzoom-figure
-    src="MO-RA!.jpg"
+    src="images/compressed/MO-RA!.webp"
     alt="A MO-RA V3 360 PRO PC Watercooling Radiator from [Watercool](https://watercool.de)"
     caption="A MO-RA V3 360 PRO PC Watercooling Radiator from [Watercool](https://watercool.de)"
 >}}
 
-The centerpiece of the build, which the control unit and pump mount to, is the "MOther of all RAdiators", version 3, from Watercool. This is the 360mm version with support for up to 18 fans. It's constructed more in the spirit of a vehicle radiator than a traditional PC radiator, with a less restrictive fin stack and large, round tubes rather than thin rectangular ones. It provides several mounting points for accessories which I was able to utilize to secure it to my server rack in a satisfactorily sturdy fashion. An in-depth teardown on the construction method and material quality of the MO-RA can be found on [igor'sLAB](https://www.igorslab.de/en/the-big-radiator-material-test-how-much-copper-and-technology-is-in-the-watercool-mo-ra3-360-pro-part-4/). For fans, I have a collection of old Corsair Air Series SP120s, from the days before we had RGB and PWM control on everything. They've all been retired from regular use, because of noise-related aging issues. In fact, one of them failed to turn at all once I had everything wired up, and another had its bearing disintegrate (and I really mean disintegrate, the fan became almost entirely un-born and would consistently ram into its own frame) about 8 weeks after putting the thing into service. That being said, they did survive (and continue to survive, in the remaining 16 cases) 24/7 use for anywhere from 4-10 years, at bottom of the barrel pricing, so that's not too bad.
+I got a secondhand Corsair XD5 pump/res combo from eBay for about sixty bucks, which is pretty good for a genuine D5-based pump/res combo. It has PWM support which I did wire up, but the flow rate ended up being so low at 100% that I just run it at 100% all the time. The flow rate is measured through an [Aqua Computer flow sensor](https://shop.aquacomputer.de/Monitoring-and-Controlling/Sensors/Flow-sensor-high-flow-LT-G1-4::3951.html), which is simply a hall-effect tachometer translated to l/h through software. I did not attempt to verify the accuracy of the sensor in my setup. The absolute accuracy is less relevant than simply getting an overall idea of whether or not the measurement is consistent with flow behavior, which it is.
 
 {{< panzoom-figure
-    src="Mounting_Detail.jpg"
-    alt="Simple, cheap aluminum bars and angles mount to the studs on the radiator and into the stud holes on the server rack."
-    caption="Simple, cheap aluminum bars and angles mount to the studs on the radiator and into the stud holes on the server rack."
->}}
-
-I got a secondhand Corsair XD5 pump/res combo from eBay for about sixty bucks, which is pretty good for a genuine D5-based pump/res combo. It has PWM support which I did wire up, but the flow rate ended up being so low at 100% that I just run it at 100% all the time. The flow rate is measured through an [aquacomputer flow sensor](https://shop.aquacomputer.de/Monitoring-and-Controlling/Sensors/Flow-sensor-high-flow-LT-G1-4::3951.html), although based on the rather vague calibration guide in the manual, I'm not exactly confident in the exact-ness of my readings with it. In either case, the temperature deltas between the blocks and the water have been more than adequate at whatever the true flow rate is.
-
-{{< panzoom-figure
-    src="Triple_Card_Jank.jpg"
-    alt="My initial setup with 3x 2080 Tis air cooled, using m.2 NVMe to PCIe risers in an ASUS prebuilt. Two are connected by NVLINK, which I found to provide a slight performance benefit on the order of ~1-5% in multi-GPU training and inference, but not really worth the cost most people are charging for them these days..."
-    caption="My initial setup with 3x 2080 Tis air cooled, using m.2 NVMe to PCIe risers in an ASUS prebuilt. Two are connected by NVLINK, which I found to provide a slight performance benefit on the order of ~1-5% in multi-GPU training and inference, but not really worth the cost most people are charging for them these days..."
+    src="images/compressed/Mounting_Detail.webp"
+    alt="Simple, cheap aluminum bars and angles mount to the studs on the radiator and into the stud holes on the server rack, and the pump and control box mount onto brackets along with the fans."
+    caption="Simple, cheap aluminum bars and angles mount to the studs on the radiator and into the stud holes on the server rack, and the pump and control box mount onto brackets along with the fans."
 >}}
 
 #### CPUs
-The parts that I'm cooling are dual Xeon Gold 6154s, which are Skylake-SP architecture. This specific SKU has 18 cores with sustained all-core speeds of 3.7GHz SSE / 3.3GHz AVX2 / 2.7GHz AVX512, and a TDP of 200 watts. I've observed them running as high as 220 watts in sustained loads under watercooled conditions, though.
+My problematic upgrade was to dual Xeon Gold 6154s, which are Skylake-SP architecture. This specific SKU has 18 cores with sustained all-core speeds of 3.7GHz SSE / 3.3GHz AVX2 / 2.7GHz AVX512, and a TDP of 200 watts. The rated tjmax was 105C, and with the chassis cooling, they readily met that and started throttling under all-core loads, idling as high as 60-70\*C. I previously had Xeon e5-2697 v2s, which had TDPs of 130w. They got toasty, but never throttled. I'm not sure if the chassis had fan upgrades available that might have made a difference, and I certainly could have moved to 4u-compatible tower coolers rather than forced air, but I figured if I was going to cool the GPUs anyway, adding the CPUs as well would be minimal cost/effort, with more future compatibility for the waterblocks compared to a specialized LGA3647 tower cooler.
 
 {{< panzoom-figure
-    src="Coldplate.jpg"
+    src="images/compressed/Coldplate.webp"
     alt="Alphacool Eisblock XPX Pro coldplate. Image credit & copyright - [igor'sLAB](https://www.igorslab.de/en/ryzen-threadripper-2990-wx-with-500-w-alphacool-iceblock-xpx-aurora-pro-plexi-digital-rgb-in-test/)"
     caption="Alphacool Eisblock XPX Pro coldplate Image credit & copyright - [igor'sLAB](https://www.igorslab.de/en/ryzen-threadripper-2990-wx-with-500-w-alphacool-iceblock-xpx-aurora-pro-plexi-digital-rgb-in-test/)"
 >}}
 
-The CPU waterblocks are Alphacool Eisblock XPX Pro Aurora Light models, which are significantly cheaper than the XPX Aurora Pro not-light version. They appear to be entirely identical, functionally... I'm not sure if there any actual performance benefits offered by the not-light version. It's a relatively obscure block family without many good reviews, which makes sense, given this block is designed for full coverage on Xeons/Threadrippers. It would comically outsize consumer processors and unnecessarily restrict your flow, although it does come with brackets for consumer sockets should you really want to use one with them. The coldplate appears to be skived, which is uncommon in this price bracket for a discrete block, and the fins are incredibly short and dense. A single instance of this block would, alone, restrict your loop's flow to a ridiculous degree, though people worry far too much about flow rate. I've seen people mounting three D5s to the MO-RA to cool a single CPU and GPU with much less restrictive fins... In my case, at maximum load, the maximum core temperature delta relative to the water temperature at radiator outflow is 25\*C, with a ~1-2\*C average delta between the two serially-connected sockets at a (supposed) flow rate of ~130L/h.
+The CPU waterblocks are Alphacool Eisblock XPX Pro Aurora Light models, which are significantly cheaper than the XPX Aurora Pro not-light version. They appear to be entirely identical, functionally... I'm not sure if there any actual performance benefits offered by the not-light version. It's a relatively obscure block family without many thorough reviews, which makes sense, given this block is designed for full coverage on Xeons/Threadrippers. The coldplate appears to be skived, which is uncommon in this price bracket for a discrete block, and the fins are incredibly short and dense. A single instance of this block alone would restrict your loop's flow to a ridiculous degree, but in my case, having four blocks + quick disconnects makes it less overall impactful. At maximum load, the maximum core temperature delta relative to the water temperature is 25\*C, with a ~1-2\*C average delta between the two serially-connected sockets at a flow rate of ~130L/h, and that's more than sufficient.
 
 {{< panzoom-figure
-    src="Dual_Blocks_Zoom.jpg"
+    src="images/compressed/Dual_Blocks_Zoom.webp"
     alt="Interior view of the Supermicro CSE-846 chassis showcasing the installed waterblocks and other components."
     caption="Interior view of the Supermicro CSE-846 chassis showcasing the installed waterblocks and other components."
 >}}
 
-This case did have a shroud for forced airflow over passive heatsinks, but the setup proved insufficient for the 6154s. Under sustained all-core loads they would reach thermal saturation and start throttling within minutes, even on full jumbo-jet takeoff screech mode... Which is not cool. Particularly if I ever upgrade to the off-roadmap SKUs with TDPs of up to 240w.
-
 #### GPUs
-I had already been thinking about watercooling the GPUs, two 2080 Tis modded with 22GB of VRAM, before I upgraded my server and discovered that its cooling was insufficient. The OEM coolers were... Fine. Nothing special. Loud. Very toasty in a 2 slot configuration that fit my cheapo Quadro NVLINK bridge. I couldn't maintain 1800MHz without alternatively power/thermal throttling depending on the circumstances. The actual temperature is not a conern, despite what some/many/most peopl seem to believe. Thermal cycles - not *long periods of prolonged exposure to 'high'[^thermalfears] temperature*, in and of itself, under reasonable circumstances - are the number one killer of modern GPUs with the enormous dies that they now have. Mismatches in thermal expansion between the die and the substrate will eventually cause the solder joints between them to break, regardless of how well you treat it, so long as you're letting it get hot, then cold, then hot, then cold... The number one way to make sure a modern GPU lives a long life is to reduce its experience of thermal cycles (used mining GPUs are actually better buys than used gaming GPUs, fight me), or reduce the extremity of the cycles. The only thing that temperature actually affects, within manufacturer limits, are boost clocks, and leakage current. A cooler chip will use less power to run at the same clock speed compared to a hotter chip due to reduced leakage current, making them measurably more energy efficient per unit of work. You can see a not-insignificant, measurable drop in total board power draw at the same clock speed by dropping the average core temperature from 80\*C to <40\*C[^citationneeded], as was my experience here. You can also destroy those efficiency gains by further overclocking. It's up to you!
+
+The GPU blocks are Phanteks 2080 Ti Founder's Edition blocks. Nothing special, they're just the cheapest matching ones I could find in 2024 that looked like they'd fit these almost-reference-but-not-quite OEM cards without extensive modification. I bought the GPUs from a supplier dedicated to the cause of specifically selling 22GB modded 2080 Tis, [for quite a reasonable price.](https://2080ti22g.com/ "#not an ad, but it could be 🪝☝️😜") It's by far the best value for $/GB VRAM in NVIDIA GPUs,[^pascalbad] although for your usecase, you will have to judge the speed-value proposition compared to used 3090 (Ti)s. Performance improvements in ML tasks between the 2080 Ti and 3090 (Ti) ranges from as little as ~20% to as much as ~100% depending on how memory bandwidth constrained your workload is. With secondhand 3090 (Ti)s still going for minimum $700 on the used market in the US, I found the alternative 2080 Ti option to be more alluring. The idea of having a modded GPU in itself was also appealing and definitely part of why I made that decision. Pulling up a hardware monitor and seeing a 2080 Ti with 22GB of VRAM  feels a little bit naughty, and I like that. I did initially buy three of them, as pictured above, but one of them failed just after the 30 day warranty period listed on their website. Despite that, they were kind enough to offer a full refund if I covered return shipping, and were very communicative and responded in <24 hours every time I sent them any kind of message/inquiry.
+
 {{< panzoom-figure
-    src="GPUs_Installed.jpg"
+    src="images/compressed/GPUs_Installed.webp"
     alt="The blocks installed in an ASUS prebuilt gaming tower."
     caption="The blocks installed in an ASUS prebuilt gaming tower."
 >}}
 
-Thus, it follows, provided you don't somehow break things while installing the block, watercooling is the second-best method to ensure the longevity of your GPU behind never using it or always keeping it under full load. It also generally allows the memory to clock a bit higher as it can be kept significantly cooler by the less-heat-saturated surface area of the block compared to a traditional air cooler. Although I can't benchmark the temperature on these cards in particular as they do not expose VRAM temperature sensors, I can confirm that putting them under water allowed the memory to clock marginally higher than under the stock air cooler. They can run at 1800MHz core clock at <15*C delta die temp above the water temperature, which now, thanks to losing the onboard fan and some unquantifiable reduction of leakage current thanks to a significantly reduced temperature, runs this clock speed at ~230w reported board power draw, workload dependent. The board only allows a 280w power limit, although it would likely be possible to flash an alternate vBIOS with a higher limit... But it wouldn't be worth it, efficiency wise, things get bleak when you approach 2GHz on these cards. Some quick searching gave me people reaching 2100MHz - or +16% relative core clock, but at >400 watts... Much like a 3090. 🤔!
+With the stock air cooler, I couldn't maintain 1800MHz core clock without alternatively power/thermal throttling. 1800MHz is a somewhat arbitrary choice of clock speed that is technically overclocked from the 2080 Ti base, but still reasonably power efficient. The actual temperature is not a concern, in terms of longevity, despite what some/many/most people seem to believe. It does have a direct impact on performance, but most people are not suffering thermal throttling to the degree that their performance is affected in a way that they would actually notice in a blind test.
+
+The biggest benefit that watercooling brings to modern video cards is a prolonged lifespan. Not due to lower core temperatures, in an absolute sense, but due to the reduced stress from thermal cycles. Mismatches in the rate of thermal expansion between the die and the substrate will eventually cause their bond to break, and this happens faster the larger your die is. Today's GPU dies are huge, and this failure mode is the most common.
+
+Thus, it follows, provided you don't somehow break things while installing the block, watercooling is the second-best method to ensure the longevity of your GPU behind never using it or always keeping it under full load. It also generally allows the memory to clock a bit higher as it can be kept significantly cooler by the less-heat-saturated surface area of the block compared to a traditional air cooler. Although I can't benchmark the before and after memory temperature on these cards in particular as they do not expose VRAM temperature sensors, I can confirm that putting them under water allowed the memory to clock marginally higher than under the stock air cooler.
 
 {{< panzoom-gallery caption="The GPU blocks required a *moderate amount of light massaging* to properly fit on these OEM model cards. The power plugs are in a different position and a singular capacitor on these models is slightly taller than on the actual Founder's Edition reference card, but they're otherwise identical. Enough.">}}
     {{< panzoom-figure
-    src="Block_Mod_Detail_A.jpg"
+    src="images/compressed/Block_Mod_Detail_A.webp"
     alt="Trimmed area for the capacitor."
     gallery_class="grid-w25"
     >}}{{< panzoom-figure
-    src="Block_Mod_Detail_B.jpg"
+    src="images/compressed/Block_Mod_Detail_B.webp"
     alt="An area of the block cut out to make room for the power plugs."
     gallery_class="grid-w25"
     >}}
     {{< panzoom-figure
-    src="Tall_Capacitor.jpg"
+    src="images/compressed/Tall_Capacitor.webp"
     alt="Showcasing the capacitor fitting into the trimmed area."
     gallery_class="grid-w50"
     >}}
     {{< panzoom-figure
-    src="Different_Plugs.jpg"
+    src="images/compressed/Different_Plugs.webp"
     alt="Showcasing the plugs fitting into the cutout area."
     gallery_class="grid-w50"
     >}}
 {{< /panzoom-gallery >}}
 
-The GPU blocks are Phanteks 2080 Ti Founder's Edition blocks. Nothing special, they're just the cheapest matching ones I could find in 2024 that looked like they'd fit these almost-reference-but-not-quite OEM cards without extensive modification. I bought the GPUs from a supplier dedicated to the cause of specifically selling 22GB modded 2080 Tis, [for quite a reasonable price.](https://2080ti22g.com/ "#not an ad, but it could be 🪝☝️😜") It's by far the best value for $/GB VRAM in NVIDIA GPUs,[^pascalbad] although for your usecase, you will have to judge the speed-value proposition compared to used 3090 (Ti)s. Performance improvement in ML tasks between the 2080 Ti and 3090 (Ti) ranges from as little as ~20% to as much as ~100% depending on how memory bandwidth constrained your workload is. With secondhand 3090 (Ti)s still going for minimum $700 on the used market in the US, I found the alternative 2080 Ti option to be more alluring. The idea of having a modded GPU in itself was also appealing and definitely part of why I made that decision. Pulling up a hardware monitor and seeing a 2080 Ti with 22GB of VRAM just feels a little bit naughty, and I like that. It should be noted that I did initially buy three of them, and one of them failed just after the 30 day warranty period listed on their website. However, despite that, they were kind enough to offer a full refund if I covered return shipping, and were very communicative and responded in <24 hours every time I sent them any kind of message/inquiry.
+Temperature, as an absolute value, within manufacturer limits, affects boost clocks, and leakage current. A cooler chip will use less power to run at the same clock speed compared to a hotter chip due to reduced leakage current, making them measurably more energy efficient per clock cycle the colder they run. Quantifying the exact drop in power use due to reduced leakage current is not possible as I do not have an isolated measurement of how much power the fan used, which draws from the total board power budget. In my case, with the fan on max, while not thermal throttling, these GPUs would bounce off the power limit of 280w while attempting to hit a core clock of 1800MHz. Under water, at a measured core temperature of ~30*C, the reported board power draw is only ~220w at 1800MHz core clock for the same workload. The type of fan typically found in these coolers is rated anywhere from 15-30w on its own.
 
 ### Putting the I in DIY
-{{< panzoom-figure
-    src="Test_Fit.jpg"
-    alt="Plopping all the major components in a box to see what happens in my brain."
-    caption="Plopping all the major components in a box to see what happens in my brain."
->}}
 
 In no particular order, here is a list of the major components involved in the control system.
 - Generic metal box, that used to contain backup batteries for a PBX system.
@@ -124,13 +131,21 @@ In no particular order, here is a list of the major components involved in the c
 - Adafruit Arduino Uno Proto Shield
 - DS18B20 temperature probes
 
+{{< panzoom-figure
+    src="images/compressed/Test_Fit.webp"
+    alt="Plopping all the major components in a box to see what happens in my brain."
+    caption="Plopping all the major components in a box to see what happens in my brain."
+>}}
+
+
 Unfortunately, I didn't take excruciatingly detailed pictures of literally every single step of the assembly/prototyping process, but it's not that complicated or interesting in terms of electrical engineering. For the most part, it's just plugging pre-made components together. The most interesting production notes include the pressure sensor and the power supply.
 
 #### Putting New Life into an iMac PSU
+
 Some time ago, my aunt gave me her first-gen Intel White iMac, which is visually very similar to the G5, and it was one of the earliest things that I installed Linux on. I used it as a seedbox for a bit, but eventually took it apart and saved some of the more interesting stuff. The hard drive is still running in my router today!
 
 {{< panzoom-figure
-    src="schematic_minify.svg"
+    src="images/compressed/schematic_minify.svg"
     alt="My schematic for the control unit. It's the first time I've used KiCad, and the first time I've ever made a schematic like this at all. I hope it's relatively legible."
     caption="My schematic for the control unit. It's the first time I've used KiCad, and the first time I've ever made a schematic like this at all. I hope it's relatively legible."
 >}}
@@ -143,20 +158,20 @@ While I did wire up the pump PWM, tachometer, and fan tachometer, I didn't reall
 
 #### Measuring vacuum
 
-For some reason, I had a really hard time finding a vacuum pressur sensor. There are plenty of physical, analogue vacuum gauges available, but an actual, electronic sensor... At least for reasonable prices, located in the US, I could only find ones that measured positive pressure. Maybe I had the wrong search terms. Eventually I found an unpackaged sensor with obscure, not entirely legible datasheets that claimed to have an acceptable pressure range for my application. The [MD-PS002](https://electronperdido.com/wp-content/uploads/2021/12/MD_PS002-Datasheet.zh-CN.en_.pdf) is what I settled on, available on Amazon in the US in a 2-pack for $8. It's a tiny little thing, and it took two attempts to successfully create a sensor package that didn't leak.
+The leak-resisting aspect all hinges on monitoring the pressure of the loop. For some reason, I had a really hard time finding a vacuum pressur sensor. There are plenty of physical, analogue vacuum gauges available, but an actual, electronic sensor... At least for reasonable prices, located in the US, I could only find ones that measured positive pressure. Maybe I had the wrong search terms. Eventually I found an unpackaged sensor with obscure, not entirely legible datasheets that claimed to have an acceptable pressure range for my application. The [MD-PS002](https://electronperdido.com/wp-content/uploads/2021/12/MD_PS002-Datasheet.zh-CN.en_.pdf) is what I settled on, available on Amazon in the US in a 2-pack for $8. It's a tiny little thing, and it took two attempts to successfully create a sensor package that didn't leak.
 
 {{< panzoom-gallery caption="Sensor package details, installed and all gooped up.">}}
     {{< panzoom-figure
-    src="plug_detail_top.jpg"
+    src="images/compressed/plug_detail_top.webp"
     alt="Top view of the sensor JB Welded into the drilled out plug."
     gallery_class="grid-w50"
     >}}{{< panzoom-figure
-    src="plug_detail_bottom.jpg"
+    src="images/compressed/plug_detail_bottom.webp"
     alt="Bottom view of the sensor JB Welded into the drilled out plug."
     gallery_class="grid-w50"
     >}}
     {{< panzoom-figure
-    src="goopy_installed.jpg"
+    src="images/compressed/goopy_installed.webp"
     alt="Sensor package with additional JB Weld installed into the vacuum tank."
     gallery_class="grid-w100"
     >}}
@@ -180,17 +195,17 @@ Everything else was mostly uneventful. I got a medium-power PWM motor driver wit
 
 {{< panzoom-gallery caption="Required additions to the solenoid, pump motor, and the complete assembly without cover.">}}
     {{< panzoom-figure
-    src="pump_greeble.jpg"
+    src="images/compressed/pump_greeble.webp"
     alt="Top view of the sensor JB Welded into the drilled out plug."
     gallery_class="grid-w45"
     >}}
     {{< panzoom-figure
-    src="complete_assembly.jpg"
+    src="images/compressed/complete_assembly.webp"
     alt="Bottom view of the sensor JB Welded into the drilled out plug."
     gallery_class="grid-w55"
     >}}
     {{< panzoom-figure
-    src="solenoid_diode.jpg"
+    src="images/compressed/solenoid_diode.webp"
     alt="Sensor package with additional JB Weld installed into the vacuum tank."
     gallery_class="grid-w45"
     >}}    
@@ -203,6 +218,8 @@ In my initial tests, I found that operating the pump and solenoid would cause th
 I soldered up a sort of bus bar for the fan connectors, used an Adafruit proto-shield to interface several connectors with the Arduino, and did a similar plug-drilling setup for the water temperature sensors with a generic Dallas temperature probe. That pretty much covers everything noteworthy about the hardware.
 
 ## The Software
+
+{{< gitea server="https://git.neet.works" repo="rawhide_k/server-watercooling-controller">}}
 
 As I mentioned earlier, my software is incomplete. The server-side is currently just a brute-force JSON-over-serial reader writte in Python. I will update this section in the future when I have the JSON-serial-Zabbix bridge setup. It will mostly be for intellectual interest to see how the temperatures change throughout the year and whether or not the leak rate changes meaningfully over time. I plan to setup alerts and emergency shutdowns for out-of-bounds leak rates, or pump failure, of course, but with proper soft-tubing setups spontaneous failures are exceedingly rare, and the negative pressure should prevent/notify of any kind of impending failure before anything actually leaks. D5 pump failures are exceedingly rare when run in clean systems at a fixed speed with infrequent starts/stops, but they do happen.
 
@@ -334,11 +351,26 @@ Theoretically the loop should handle water temperatures in excess of 60\*C witho
 
 ## Other Thoughts?
 
+Just a note, the software hadn't been 100% finalized when I took the below pictures. The control box does have a lid now, and all the cable management is a lot cleaner... Promise!
+
+{{< panzoom-gallery caption="Required additions to the solenoid, pump motor, and the complete assembly without cover.">}}
+    {{< panzoom-figure
+    src="images/compressed/complete_a.webp"
+    alt="Front-ish view of the complete rack assembly."
+    gallery_class="grid-w50"
+    >}}
+    {{< panzoom-figure
+    src="images/compressed/complete_b.webp"
+    alt="Back-ish view of the complete rack assembly."
+    gallery_class="grid-w50"
+    >}} 
+{{< /panzoom-gallery >}}
+
 This project had a lot of firsts for me. It was the first time I've done any kind of embedded-adjacent development beyond "ooooo look at the blinky light, oooooooo it turns off when you press the button, wwaaaow", and the first time I'd designed something with so many individual parts. I've never worked with air pumps, solenoids, or pressure sensing before, nor had to debug issues like the lack of flyback diodes.
 
 I learned that I hate drilling through sheet steel, especially without a drill press. I really, really hate drilling through steel. I should have gotten an aluminum or plastic project box instead of using that stupid battery box. If I were to ever take it apart again, I'd add a passthrough for the SPI header, and/or an external reset button. I'd like to think that I'm going to stop poking into boxes that have live electricity inside of them, but I'm not sure that one is going to stick. I should have gotten a physical display of some type that could show the sensors and debug info on the device itself without being connected to another device to readout the data.
 
-I'd like to get a second pump, for redundancy's sake and to increase the flow rate. But it's going to be such a pain to install that I feel like I'm never going to bother to do it, unless the current pump fails. I was also slightly concerned about the evaporation rate of the liquid via the vacuum tank, and that I'd need to add some kind of fluid level detection system, but there's been no noticeable loss thus far. Now that I know the pump turns on so infrequently, I can't imagine that it's going to need to be topped up anytime soon.
+I'd like to get a second pump, for redundancy's sake and to increase the flow rate. But it's going to be such a pain to install that I feel like I'm never going to bother to do it, unless the current pump fails, or I add more components to be cooled and the flow is adversely affected. I was also slightly concerned about the evaporation rate of the liquid via the vacuum tank, and that I'd need to add some kind of fluid level detection system, but there's been no noticeable loss thus far. Now that I know the pump turns on so infrequently, I can't imagine that it's going to need to be topped up anytime soon.
 
 Godbwye.
 
@@ -347,5 +379,3 @@ Godbwye.
 [^thermalfears]: I don't understand why people don't trust the manufacturer specifications when it comes to silicon temperature limits, beyond unfounded conspiracy nonsense around planned destruction/obselence. In terms of Intel server SKUs, you find that the throttling temp is *higher* than on consumer SKUs, despite the higher reliability demanded by the enterprise market... I'm assuming that this is due to reduced hotspot variance thanks to generally lower voltage spread from lower boosting clock speeds. On enterprise SKUs which are focused on single threaded performance, the throttling temp is typically lower than those without the ability to boost as high. If you have evidence to the contrary, let me know.
 
 [^badnomenclature]: I don't understand why people call custom loops 'open loops'. They're not open. They're closed. People correctly use the phrase 'closed loop' when referring to AIOs. This phrasing has been pervasive for at least ten years and it bugs me a lot. AIOs are sealed units where the liquid has no interaction with the external environment. Custom loops are sealed units where the liquid has no interaction with the external environment. They're both closed in operation. Outside of the PC watercooling space, 'open loop' would imply that your cooling method intakes fresh coolant and outputs waste that is not directly recovered. LN2 overclocking, in the PC world, is a form of open loop liquid cooling. If you were putting water into your loop via your sink, and dumping the output into the drain, that would be open loop water cooling. Eternally recycling the same liquid in a sealed loop is not open. It's closed. It's a closed loop.
-
-[^citationneeded]: Quantifying the exact power drop due to reduced leakage current is not possible as I do not have an isolated measurement of fan power use. The fan on a blower-type card such as this can exceed 20w power draw. Approximately 50w reduced power use at the same performance level can be attributed to a combination of removing the built-in fan plus a reduction of leakage current.
