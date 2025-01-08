@@ -33,12 +33,9 @@
           {{ if .Params.showBreadcrumbs | default (.Site.Params.article.showBreadcrumbs | default false) }}
           {{ partial "breadcrumbs.html" . }}
           {{ end }}
-          <h1 class="mt-0 text-4xl font-extrabold text-neutral-900 dark:text-neutral">
+          <h1 class="mt-0 text-4xl font-extrabold cool-title">
             {{ .Title | emojify }}
           </h1>
-          <div class="mt-1 mb-6 text-base text-neutral-500 dark:text-neutral-400 print:hidden">
-            {{ partial "article-meta/basic.html" (dict "context" . "scope" "single") }}
-          </div>
       
           {{ $authorsData := .Site.Data.authors }}
           {{ $taxonomies := .Site.Taxonomies.authors }}
@@ -52,10 +49,18 @@
       
           {{ if not (.Params.showAuthorBottom | default ( .Site.Params.article.showAuthorBottom | default false)) }}
             
-            {{ if .Params.showAuthor | default (.Site.Params.article.showAuthor | default true) }}
-              {{ $showAuthor = 1 }}
-              {{ partial "author.html" . }}
-            {{ end }}
+
+            <div class="flex flex-row">
+              {{ if .Params.showAuthor | default (.Site.Params.article.showAuthor | default true) }}
+                {{ $showAuthor = 1 }}
+                {{ partial "author.html" . }}
+              {{ end }}
+              <div style="padding-left:8px;" class="mt-1 mb-6 text-base text-neutral-500 dark:text-neutral-400 print:hidden max-w-fit">
+                {{ partial "article-meta/basic.html" (dict "context" . "scope" "single") }}
+              </div>
+            </div>
+
+            <hr>
       
             {{ range $author := .Page.Params.authors }}
               {{ $authorData := index $authorsData $author }}
@@ -68,11 +73,6 @@
                 {{ partial "author-extra.html" (dict "context" . "data" $authorData "link" $taxonomyLink) }}
               {{- end -}}
             {{ end }}
-      
-            {{ if or $taxonomyLink $showAuthor }}
-            <div class="mb-5"></div>
-            {{ end }}
-      
           {{ end }}
       
         </header>
