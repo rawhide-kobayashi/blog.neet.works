@@ -90,8 +90,6 @@ function initializePanzoom() {
       const startX = (viewportWidth - imageWidth * scale) / 2;
       const startY = (viewportHeight - imageHeight * scale) / 2;
 
-      console.log(startX, startY, imageWidth, imageHeight, viewportWidth, viewportHeight)
-
       // But only modifying y is necessary because centering works VIA CESSPOOL HORIZONTALLY BUT NOT VERTICALLY
       panzoomInstance = Panzoom(popupImage, {
         startY: startY,

@@ -19,7 +19,7 @@ categories:
 ---
 
 ## Overview
-Watercooling - or, more accurately, custom loop watercooling[^badnomenclature] over AIOs - has increasingly transitioned to an aesthetic choice rather than a practical one in the consumer gaming space, with more energy efficient chips overclocked out the wazoo from the factory and relatively minimal gains to be made compared to cheaper and easier AIO solutions. However, there are still benefits to be had, marginal as they are, in performance, aesthetics, and convenience. A lot of people are intimidated by custom watercooling, especially when it comes to their costly (in terms of cash, or time, or both) homelab setups. Some will even call you CRAZY (which is very rude, by the way) for saying you want to watercool your server. In this post I'm going to showcase my solution for a leak-resistant watercooling system with monitoring that I trust to protect my beloved rack from the horrors of water damage as well as thermal throttling.
+Watercooling - or, more accurately, custom loop watercooling[^badnomenclature], rather than AIOs - has increasingly transitioned to an aesthetic choice rather than a practical one in the consumer gaming space, with more energy efficient chips overclocked out the wazoo from the factory and relatively minimal gains to be made compared to cheaper and easier AIO solutions. However, there are still benefits to be had, marginal as they are, in performance, aesthetics, and longevity. In this post I'm going to showcase my solution for a leak-resistant watercooling system with monitoring that I trust to protect my beloved homelab from water damage as well as thermal throttling.
 
 {{< panzoom-figure
     src="images/compressed/Triple_Card_Jank.webp"
@@ -27,7 +27,7 @@ Watercooling - or, more accurately, custom loop watercooling[^badnomenclature] o
     caption="My initial setup with 3x 2080 Tis, using m.2 NVMe to PCIe risers in an ASUS prebuilt. Two are connected by NVLINK, which I found to provide a slight performance benefit on the order of ~1-5% in multi-GPU SISR training, which is not worth the typical price for NVLINK bridges from this era. I was lucky to get this ugly, quadro-oriented bridge for just $40."
 >}}
 
-I had wanted to watercool my ML setup for a while, particularly so I could use NVLINK without suffocating the GPUs. The above setup worked, but it was loud, the clock speeds were inconsistent, VRAM overclocking was very limited, they would bounce off the power/temperature limit, and it was an incredible pain to move whenever I had to poke around in there. However, I was very deeply concerned about the possibility of water damage. I've been watercooling since 2020, and I've never had a leak, but there were going to be more connected components than ever, with wider temperature swings, and collectively, a whole lot more expensive hardware that might get damaged than compared to my desktop setup. The situation became more dire to me, after I upgraded my main server and discovered that the forced-air passive chassis cooling was insufficient for my new CPUs.
+I had wanted to watercool my ML setup for a while, particularly so I could use NVLINK without suffocating the GPUs. The above setup worked, but it was loud, the clock speeds were inconsistent, VRAM overclocking was very limited, they would bounce off the power/temperature limit, and it was an incredible pain to move whenever I had to poke around in there. Of course, I was concerned about the possibility of water damage. I've been doing custom watercooling since 2020 in my desktop, and I've never had a leak, but there were going to be more connected components than ever, with wider temperature swings, and collectively, a whole lot more expensive hardware that might get damaged than compared to my desktop setup. The situation became more dire to me, after I upgraded my main server and discovered that the forced-air passive chassis cooling was insufficient for my new CPUs.
 
 So, how do you make a fluid system resistant to leaks? Build it very well, with close attention to detail, tighten all the fittings very carefully, regularly replace your o-rings and leak-check extensively before operation? No! You pull a vacuum inside the fluid loop! Just think about it. Water can't get out if air is trying to get in. It's so simple. I wish I could say that I came up with the concept myself, but I didn't. After finding out that Aqua Computer has a product called LEAKSHIELD which does exactly that, I finally had the confidence to take the plunge on this project.
 
@@ -65,7 +65,7 @@ My problematic upgrade was to dual Xeon Gold 6154s, which are Skylake-SP archite
     caption="Alphacool Eisblock XPX Pro coldplate Image credit & copyright - [igor'sLAB](https://www.igorslab.de/en/ryzen-threadripper-2990-wx-with-500-w-alphacool-iceblock-xpx-aurora-pro-plexi-digital-rgb-in-test/)"
 >}}
 
-The CPU waterblocks are Alphacool Eisblock XPX Pro Aurora Light models, which are significantly cheaper than the XPX Aurora Pro not-light version. They appear to be entirely identical, functionally... I'm not sure if there any actual performance benefits offered by the not-light version. It's a relatively obscure block family without many thorough reviews, which makes sense, given this block is designed for full coverage on Xeons/Threadrippers. The coldplate appears to be skived, which is uncommon in this price bracket for a discrete block, and the fins are incredibly short and dense. A single instance of this block alone would restrict your loop's flow to a ridiculous degree, but in my case, having four blocks + quick disconnects makes it less overall impactful. At maximum load, the maximum core temperature delta relative to the water temperature is 25\*C, with a ~1-2\*C average delta between the two serially-connected sockets at a flow rate of ~130L/h, and that's more than sufficient.
+The CPU waterblocks are Alphacool Eisblock XPX Pro Aurora Light models, which are significantly cheaper than the XPX Aurora Pro not-light version. They appear to be entirely identical, functionally... I'm not sure if there any actual performance benefits offered by the not-light version. It's a relatively obscure block family without many thorough reviews, which makes sense, given this block is designed for full coverage on Xeons/Threadrippers. The coldplate appears to be skived, which is uncommon in this price bracket for a discrete block, and the fins are incredibly short and dense. In smaller desktop loops, I've seen this block criticized for having overly restrictive flow, but when you have four blocks + quick disconnects, 'good' flow is relative.  At maximum load, the maximum core temperature delta relative to the water temperature is 25\*C, with a ~1-2\*C average delta between the two serially-connected sockets at a flow rate of ~130L/h, and that's more than sufficient.
 
 {{< panzoom-figure
     src="images/compressed/Dual_Blocks_Zoom.webp"
@@ -87,7 +87,7 @@ With the stock air cooler, I couldn't maintain 1800MHz core clock without altern
 
 The biggest benefit that watercooling brings to modern video cards is a prolonged lifespan. Not due to lower core temperatures, in an absolute sense, but due to the reduced stress from thermal cycles. Mismatches in the rate of thermal expansion between the die and the substrate will eventually cause their bond to break, and this happens faster the larger your die is. Today's GPU dies are huge, and this failure mode is the most common.
 
-Thus, it follows, provided you don't somehow break things while installing the block, watercooling is the second-best method to ensure the longevity of your GPU behind never using it or always keeping it under full load. It also generally allows the memory to clock a bit higher as it can be kept significantly cooler by the less-heat-saturated surface area of the block compared to a traditional air cooler. Although I can't benchmark the before and after memory temperature on these cards in particular as they do not expose VRAM temperature sensors, I can confirm that putting them under water allowed the memory to clock marginally higher than under the stock air cooler.
+Logically, provided you don't somehow break things while installing the block, watercooling is the second-best method to ensure the longevity of your GPU behind never using it, or always keeping it under full load. It also generally allows the memory to clock a bit higher as it can be kept significantly cooler by the less-heat-saturated surface area of the block compared to a traditional air cooler. Although I can't benchmark the before and after memory temperature on these cards in particular as they do not expose VRAM temperature sensors, I can confirm that putting them under water allowed the memory to clock marginally higher than under the stock air cooler.
 
 {{< panzoom-gallery caption="The GPU blocks required a *moderate amount of light massaging* to properly fit on these OEM model cards. The power plugs are in a different position and a singular capacitor on these models is slightly taller than on the actual Founder's Edition reference card, but they're otherwise identical. Enough.">}}
     {{< panzoom-figure
@@ -145,7 +145,7 @@ Unfortunately, I didn't take excruciatingly detailed pictures of literally every
 Some time ago, my aunt gave me her first-gen Intel White iMac, which is visually very similar to the G5, and it was one of the earliest things that I installed Linux on. I used it as a seedbox for a bit, but eventually took it apart and saved some of the more interesting stuff. The hard drive is still running in my router today!
 
 {{< panzoom-figure
-    src="images/compressed/schematic_minify.svg"
+    src="schematic_minify.svg"
     alt="My schematic for the control unit. It's the first time I've used KiCad, and the first time I've ever made a schematic like this at all. I hope it's relatively legible."
     caption="My schematic for the control unit. It's the first time I've used KiCad, and the first time I've ever made a schematic like this at all. I hope it's relatively legible."
 >}}
@@ -353,7 +353,7 @@ Theoretically the loop should handle water temperatures in excess of 60\*C witho
 
 Just a note, the software hadn't been 100% finalized when I took the below pictures. The control box does have a lid now, and all the cable management is a lot cleaner... Promise!
 
-{{< panzoom-gallery caption="Required additions to the solenoid, pump motor, and the complete assembly without cover.">}}
+{{< panzoom-gallery caption="Everything installed and working!">}}
     {{< panzoom-figure
     src="images/compressed/complete_a.webp"
     alt="Front-ish view of the complete rack assembly."

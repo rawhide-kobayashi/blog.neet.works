@@ -35,6 +35,7 @@ title = "N.E.E.T. Works"
     #{ facebook = "https://facebook.com/username" },
     #{ flickr = "https://www.flickr.com/photos/username/" },
     #{ foursquare = "https://foursquare.com/username" },
+    { gitea = "https://git.neet.works/rawhide_k" },
     { github = "https://github.com/rawhide-kobayashi" },
     #{ gitlab = "https://gitlab.com/username" },
     #{ google = "https://www.google.com/" },
