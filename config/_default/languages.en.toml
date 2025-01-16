@@ -17,7 +17,7 @@ title = "N.E.E.T. Works"
 [params.author]
   name = "rawhide kobayashi"
   email = "rawhide@neet.works"
-  image = "img/blowfish_logo.png"
+  image = "img/blowfish_logo.webp"
   imageQuality = 96
   headline = "beep-boop maggot!"
   bio = "ᗜ⩊ᗜ"

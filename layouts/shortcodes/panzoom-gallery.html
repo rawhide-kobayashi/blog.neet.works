@@ -2,8 +2,9 @@
 
 {{- $caption := .Get "caption" }}
 
-
+<hr>
 <div id="{{ $id }}" class="gallery">
   {{ .Inner }}
 </div>
-{{ with $caption }}<figcaption>{{ . | markdownify }}</figcaption>{{ end }}
+{{ with $caption }}<figcaption class="caption">{{ . | markdownify }}</figcaption>{{ end }}
+<hr>

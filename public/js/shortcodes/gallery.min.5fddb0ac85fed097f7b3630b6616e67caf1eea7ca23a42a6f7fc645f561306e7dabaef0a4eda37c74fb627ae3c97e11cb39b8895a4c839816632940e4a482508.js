@@ -1,0 +1,1 @@
+function _getDefaultPackeryOptions(){return{percentPosition:!0,gutter:5,resize:!0,itemSelector:".panzoom-container"}}(function(){$(window).on("load",function(){let e=[],t=document.querySelectorAll(".gallery");t.forEach(t=>{let n=new Packery(t,_getDefaultPackeryOptions());e.push(n)}),console.groupEnd()})})()

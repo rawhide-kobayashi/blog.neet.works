@@ -50,6 +50,7 @@
 .gallery {
   width: auto; /* Allow it to size naturally */
   max-width: 100%; /* Prevent overflow */
+  margin-bottom:8px;
 }
 
 .prose :where(a):not(:where([class~="not-prose"],[class~="not-prose"] *)) {
@@ -216,4 +217,41 @@ p {
 
 .min-w-content {
   min-width:fit-content;
+}
+
+.vari-flex {
+  display:flex;
+  flex-wrap:nowrap;
+}
+
+@media (max-width: 512px) {
+  .vari-flex {
+    flex-wrap:wrap;
+  }
+}
+
+.card-styled {
+  background-color:rgba(var(--color-primary-900), 0.5);
+  border-width:2px;
+  border-style:dashed;
+  border-radius:2px;
+  border-color:rgba(var(--color-secondary-600), 1);
+  padding-top:8px;
+  padding-right:8px;
+  padding-left:8px;
+}
+
+.caption {
+  background-color:rgba(var(--color-primary-900), 0.5);
+  border-width:1px;
+  border-style:hidden;
+  border-radius:8px;
+  border-color:rgba(var(--color-secondary-600), 1);
+  padding:4px;
+  padding-left:8px;
+  padding-right:8px;
+  max-width:fit-content;
+  font-style:italic;
+  margin:auto;
+  text-align:center;
 }

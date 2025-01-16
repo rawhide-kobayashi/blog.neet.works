@@ -23,7 +23,7 @@ disableImageOptimization = false
 disableTextInHeader = false
 # backgroundImageWidth = 1200
 
-# defaultBackgroundImage = "IMAGE.jpg" # used as default for background images 
+defaultBackgroundImage = "img/background.webp" # used as default for background images 
 # defaultFeaturedImage = "IMAGE.jpg" # used as default for featured images in all articles
 
 # highlightCurrentMenuArea = true
@@ -50,8 +50,8 @@ giteaDefaultServer = "https://git.neet.works"
   showRecentItems = 9
   showMoreLink = true
   showMoreLinkDest = "/posts/"
-  cardView = false
-  cardViewScreenWidth = false
+  cardView = true
+  cardViewScreenWidth = true
   layoutBackgroundBlur = false # only used when layout equals background
 
 [article]

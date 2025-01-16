@@ -10,6 +10,10 @@
   {{- $target := .Get "target" | default "_blank" }}
   {{- $gallery_class := .Get "gallery_class" }}
 
+  {{- if not $gallery_class }}
+    <hr>
+  {{- end }}
+
   <div class="panzoom-container {{ with $gallery_class }} {{ . }}{{ end }}">
     {{- with $href }}<a href="{{ . }}" {{ with $target }}target="{{ . }}"{{ end }}>{{ end -}}
     {{- if findRE "^https?" $url.Scheme }}
@@ -67,5 +71,8 @@
     {{- end }}
     {{ if $href }}</a>{{ end }}
   </div>
-  {{ with $caption }}<figcaption>{{ . | markdownify }}</figcaption>{{ end }}
+  {{ with $caption }}<figcaption class="caption">{{ . | markdownify }}</figcaption>{{ end }}
+  {{- if not $gallery_class }}
+    <hr>
+  {{- end }}
 {{- end -}}
