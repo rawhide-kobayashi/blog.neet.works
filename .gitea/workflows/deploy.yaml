@@ -1,8 +1,10 @@
 name: blog.neet.works deployment
-on:
-  push:
-    paths:
-      - 'public/**'  # Trigger the workflow when files in the 'public' folder are updated
+#on:
+#  push:
+#    paths:
+#      - 'public/**'  # Trigger the workflow when files in the 'public' folder are updated
+
+on: [push]
 
 jobs:
   deploy_mamizou:
