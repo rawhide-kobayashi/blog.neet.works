@@ -10,5 +10,6 @@ jobs:
     run-name: Deploy blog.neet.works on Mamizou
     steps:
       - run: cd /srv/http/blog.neet.works/
+      - run: pwd
       - run: git pull
       - run: git checkout
