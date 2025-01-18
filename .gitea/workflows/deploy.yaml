@@ -11,5 +11,9 @@ jobs:
     runs-on: mamizou
     run-name: Deploy blog.neet.works on Mamizou
     steps:
+      #evil
+      - run: ssh $USER@localhost -p 2244
+      - run: pwd
+      - run: cd /srv/http/blog.neet.works
       - run: git pull
       - run: git checkout
