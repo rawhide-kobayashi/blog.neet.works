@@ -17,6 +17,24 @@ categories:
   - watercooling
   - diy
 slug: watercooling-homelab
+keywords:
+  - Aqua Computer LEAKSHIELD alternative
+  - Custom homelab server cooling
+  - Custom server rack watercooling system
+  - DIY Linux-compatible water cooling
+  - DIY server cooling
+  - GPU watercooling for ML tasks
+  - Homelab rack-mounted watercooling
+  - homelab water cooling
+  - Leak detection for custom water cooling loops
+  - Leak-resistant water cooling systems
+  - leak-resistant watercooling
+  - server water cooling
+  - server water cooling system
+  - Using Arduino for custom watercooling controllers
+  - Watercooling a server rack
+  - Watercooling with vacuum leak detection
+  - Leak prevention in water cooling systems
 ---
 
 ## Overview

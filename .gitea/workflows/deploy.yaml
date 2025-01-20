@@ -13,7 +13,6 @@ jobs:
       - run: |
           ssh $USER@localhost -p 2244 "
             cd /srv/http/blog.neet.works &&
-            pwd &&
             git pull &&
             git checkout
           "
