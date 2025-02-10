@@ -3,7 +3,7 @@ title: Benchmarking AVX-512 Video Encoding On Zen 5
 description: Comparing the performance of x265 and SVT-AV1 with AVX-512 On/Off on a Ryzen 9 9950X, as well as against an Intel i7-14700F.
 date: 2025-02-10T23:21:38.219Z
 preview: ""
-draft: true
+draft: false
 tags:
     - AMD
     - AVX-512
